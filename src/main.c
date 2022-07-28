@@ -1,7 +1,7 @@
 /**
  * @file   main.c
  * @brief  Robotic arm SDK peripheral.
- *         Nucleo-F401RE STM Board.
+ *         Nucleo-F401RE STM32 Board.
  */
 
 #include <libopencm3/stm32/rcc.h>
@@ -9,6 +9,10 @@
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/stm32/exti.h>
 #include <libopencm3/cm3/nvic.h>
+
+#define USART_BAUDRATE (9600)
+#define BUTTON_SEND_DATA ((uint8_t)0xF0)
+#define DELAY_VALUE ((uint32_t)250000)
 
 #define USB_USART (USART2)
 #define RCC_USART (RCC_USART2)
@@ -41,9 +45,6 @@
 /* D10. */
 #define D10_PORT (GPIOB)
 #define D10_PIN (GPIO6)
-
-#define BUTTON_SEND_DATA ((uint8_t)0xF0)
-#define DELAY_VALUE ((uint32_t)250000)
 
 void rcc_setup(void);
 void usart_setup(void);
@@ -103,8 +104,8 @@ void usart_setup(void)
   gpio_mode_setup(USART_RX_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, USART_RX_PIN);
   gpio_set_af(USART_RX_PORT, GPIO_AF7, USART_RX_PIN);
 
-  /* Setup USART config with 9600, 8-N-1. */
-  usart_set_baudrate(USB_USART, 9600);
+  /* Setup USART config. */
+  usart_set_baudrate(USB_USART, USART_BAUDRATE);
   usart_set_databits(USB_USART, 8);
   usart_set_stopbits(USB_USART, USART_STOPBITS_1);
   usart_set_parity(USB_USART, USART_PARITY_NONE);
