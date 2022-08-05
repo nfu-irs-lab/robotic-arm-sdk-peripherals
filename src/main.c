@@ -202,11 +202,18 @@ void usart2_isr(void)
     gpio_clear(D10_PORT, D10_PIN);
     break;
 
-  default:
+  case 0x7f: // DEL.
     gpio_set(D8_PORT, D8_PIN);
     gpio_set(D9_PORT, D9_PIN);
     gpio_set(D10_PORT, D10_PIN);
     break;
+
+  case 0x0d: // CR.
+  case 0x0a: // LF.
+  default:
+    /* Do nothing. */
+    break;
+
   }
 
   /*
