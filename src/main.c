@@ -13,6 +13,7 @@
 #define USART_BAUDRATE (9600)
 #define BUTTON_SEND_DATA ((uint8_t)0xF0)
 #define DELAY_VALUE ((uint32_t)250000)
+#define DEBOUNCE_DELAY_VALUE ((uint32_t)20000)
 
 #define USB_USART (USART2)
 #define RCC_USB_USART (RCC_USART2)
@@ -175,9 +176,14 @@ void exti15_10_isr(void)
   // Clear flag first.
   exti_reset_request(BUTTON_EXTI);
 
-  usart_send_blocking(USB_USART, BUTTON_SEND_DATA);
-  usart_send_blocking(USB_USART, ASCII_CR);
-  usart_send_blocking(USB_USART, ASCII_LF);
+  // Simple button debounce.
+  delay(DEBOUNCE_DELAY_VALUE);
+  if(gpio_get(BUTTON_PORT, BUTTON_PIN) == 0)
+  {
+    usart_send_blocking(USB_USART, BUTTON_SEND_DATA);
+    usart_send_blocking(USB_USART, ASCII_CR);
+    usart_send_blocking(USB_USART, ASCII_LF);
+  }
 }
 
 /**
