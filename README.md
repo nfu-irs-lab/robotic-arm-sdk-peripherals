@@ -1,6 +1,7 @@
 # Robotic Arm SDK Peripherals
-
 The peripherals firmware of RASDK.
+
+[`main.c`](./src/main.c)
 
 ## Serial Port Config
 - Baudrate: `9600`
@@ -8,9 +9,6 @@ The peripherals firmware of RASDK.
 - Parity: None
 - Stop bits: 1
 - Flow Control: None
-
-> https://github.com/nfu-irs-lab/robotic-arm-sdk-peripherals/blob/2644e1062e2f5446aa7b8271f3507c85acdb69a2/src/main.c#L13
-> https://github.com/nfu-irs-lab/robotic-arm-sdk-peripherals/blob/2644e1062e2f5446aa7b8271f3507c85acdb69a2/src/main.c#L108-L112
 
 ## Env
 - IDE: [PlatformIO IDE for VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html)

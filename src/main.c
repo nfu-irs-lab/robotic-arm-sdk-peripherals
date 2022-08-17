@@ -15,7 +15,7 @@
 #define DELAY_VALUE ((uint32_t)250000)
 
 #define USB_USART (USART2)
-#define RCC_USART (RCC_USART2)
+#define RCC_USB_USART (RCC_USART2)
 
 /* USART-Tx. */
 #define USART_TX_PORT (GPIOA)
@@ -45,6 +45,11 @@
 /* D10. */
 #define D10_PORT (GPIOB)
 #define D10_PIN (GPIO6)
+  
+/* ASCII Table. */
+#define ASCII_CR ((uint8_t)0x0D) // CR: \r.
+#define ASCII_LF ((uint8_t)0x0A) // LF: \n.
+#define ASCII_DEL ((uint8_t)0x7F)
 
 void rcc_setup(void);
 void usart_setup(void);
@@ -55,6 +60,7 @@ void delay(volatile unsigned int value);
 
 int main(void)
 {
+  /* Init. */
   rcc_setup();
   led_setup();
   others_gpio_setup();
@@ -70,6 +76,7 @@ int main(void)
   usart_send_blocking(USB_USART, '\r');
   usart_send_blocking(USB_USART, '\n');
 
+  /* Into main loop and wait for ISRs. */
   while (1)
   {
     /* LED on/off. */
@@ -86,7 +93,7 @@ void rcc_setup(void)
   rcc_periph_clock_enable(RCC_GPIOB);
   rcc_periph_clock_enable(RCC_GPIOC);
 
-  rcc_periph_clock_enable(RCC_USART);
+  rcc_periph_clock_enable(RCC_USB_USART);
   rcc_periph_clock_enable(RCC_SYSCFG); // For EXTI.
 }
 
@@ -161,6 +168,7 @@ void delay(volatile unsigned int value)
 
 /**
  * @brief EXTI15~10 Interrupt service routine.
+ * @remark User button.
  */
 void exti15_10_isr(void)
 {
@@ -168,10 +176,13 @@ void exti15_10_isr(void)
   exti_reset_request(BUTTON_EXTI);
 
   usart_send_blocking(USB_USART, BUTTON_SEND_DATA);
+  usart_send_blocking(USB_USART, ASCII_CR);
+  usart_send_blocking(USB_USART, ASCII_LF);
 }
 
 /**
  * @brief USART2 Interrupt service routine.
+ * @remark USB serial port.
  */
 void usart2_isr(void)
 {
@@ -202,14 +213,14 @@ void usart2_isr(void)
     gpio_clear(D10_PORT, D10_PIN);
     break;
 
-  case 0x7f: // DEL.
+  case ASCII_DEL:
     gpio_set(D8_PORT, D8_PIN);
     gpio_set(D9_PORT, D9_PIN);
     gpio_set(D10_PORT, D10_PIN);
     break;
 
-  case 0x0d: // CR.
-  case 0x0a: // LF.
+  case ASCII_CR:
+  case ASCII_LF:
   default:
     /* Do nothing. */
     break;
