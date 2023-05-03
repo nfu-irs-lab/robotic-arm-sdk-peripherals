@@ -2,6 +2,7 @@
  * @file   main.c
  * @brief  Robotic arm SDK peripheral.
  *         Nucleo-F401RE STM32 Board.
+ * @note   Board documentation: UM1724 STM32 Nucleo-64 boards (MB1136)
  */
 
 #include <libopencm3/stm32/rcc.h>
@@ -11,6 +12,7 @@
 #include <libopencm3/cm3/nvic.h>
 
 #define USART_BAUDRATE (9600)
+
 #define BUTTON_SEND_DATA ((uint8_t)0xF0)
 #define DELAY_VALUE ((uint32_t)250000)
 #define DEBOUNCE_DELAY_VALUE ((uint32_t)20000)
@@ -18,35 +20,39 @@
 #define USB_USART (USART2)
 #define RCC_USB_USART (RCC_USART2)
 
-/* USART-Tx. */
+/* GPIO: USART-Tx. */
 #define USART_TX_PORT (GPIOA)
 #define USART_TX_PIN (GPIO2)
 
-/* USART-Rx. */
+/* GPIO: USART-Rx. */
 #define USART_RX_PORT (GPIOA)
 #define USART_RX_PIN (GPIO3)
 
-/* User LED. */
+/* GPIO: User LED. */
 #define LED_PORT (GPIOA)
 #define LED_PIN (GPIO5)
 
-/* User Button. */
+/* GPIO: User Button. */
 #define BUTTON_PORT (GPIOC)
 #define BUTTON_PIN (GPIO13)
 #define BUTTON_EXTI (EXTI13)
 
-/* D8. */
-#define D8_PORT (GPIOA)
-#define D8_PIN (GPIO9)
+/* GPIO: D7. */
+#define D7_PORT (GPIOA)
+#define D7_PIN (GPIO8)
 
-/* D9. */
-#define D9_PORT (GPIOC)
-#define D9_PIN (GPIO7)
+/* GPIO: D6. */
+#define D6_PORT (GPIOB)
+#define D6_PIN (GPIO10)
 
-/* D10. */
-#define D10_PORT (GPIOB)
-#define D10_PIN (GPIO6)
-  
+/* GPIO: D5. */
+#define D5_PORT (GPIOB)
+#define D5_PIN (GPIO4)
+
+/* GPIO: D4. */
+#define D4_PORT (GPIOB)
+#define D4_PIN (GPIO5)
+
 /* ASCII Table. */
 #define ASCII_CR ((uint8_t)0x0D) // CR: \r.
 #define ASCII_LF ((uint8_t)0x0A) // LF: \n.
@@ -135,17 +141,21 @@ void led_setup(void)
 
 void others_gpio_setup()
 {
-  gpio_mode_setup(D8_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, D8_PIN);
-  gpio_set_output_options(D8_PIN, GPIO_OTYPE_PP, GPIO_OSPEED_25MHZ, D8_PORT);
-  gpio_set(D8_PORT, D8_PIN);
+  gpio_mode_setup(D7_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, D7_PIN);
+  gpio_set_output_options(D7_PIN, GPIO_OTYPE_PP, GPIO_OSPEED_25MHZ, D7_PORT);
+  gpio_set(D7_PORT, D7_PIN);
 
-  gpio_mode_setup(D9_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, D9_PIN);
-  gpio_set_output_options(D9_PIN, GPIO_OTYPE_PP, GPIO_OSPEED_25MHZ, D9_PORT);
-  gpio_set(D9_PORT, D9_PIN);
+  gpio_mode_setup(D6_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, D6_PIN);
+  gpio_set_output_options(D6_PIN, GPIO_OTYPE_PP, GPIO_OSPEED_25MHZ, D6_PORT);
+  gpio_set(D6_PORT, D6_PIN);
 
-  gpio_mode_setup(D10_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, D10_PIN);
-  gpio_set_output_options(D10_PIN, GPIO_OTYPE_PP, GPIO_OSPEED_25MHZ, D10_PORT);
-  gpio_set(D10_PORT, D10_PIN);
+  gpio_mode_setup(D5_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, D5_PIN);
+  gpio_set_output_options(D5_PIN, GPIO_OTYPE_PP, GPIO_OSPEED_25MHZ, D5_PORT);
+  gpio_set(D5_PORT, D5_PIN);
+
+  gpio_mode_setup(D4_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, D4_PIN);
+  gpio_set_output_options(D4_PIN, GPIO_OTYPE_PP, GPIO_OSPEED_25MHZ, D4_PORT);
+  gpio_set(D4_PORT, D4_PIN);
 }
 
 void button_setup(void)
@@ -178,7 +188,7 @@ void exti15_10_isr(void)
 
   // Simple button debounce.
   delay(DEBOUNCE_DELAY_VALUE);
-  if(gpio_get(BUTTON_PORT, BUTTON_PIN) == 0)
+  if (gpio_get(BUTTON_PORT, BUTTON_PIN) == 0)
   {
     usart_send_blocking(USB_USART, BUTTON_SEND_DATA);
     usart_send_blocking(USB_USART, ASCII_CR);
@@ -195,34 +205,44 @@ void usart2_isr(void)
   uint8_t indata = usart_recv(USB_USART);
   switch (indata)
   {
+  /* D7. */
   case 0x00:
-    gpio_set(D8_PORT, D8_PIN);
+    gpio_set(D7_PORT, D7_PIN);
     break;
-
   case 0x01:
-    gpio_clear(D8_PORT, D8_PIN);
+    gpio_clear(D7_PORT, D7_PIN);
     break;
 
+  /* D6. */
   case 0x10:
-    gpio_set(D9_PORT, D9_PIN);
+    gpio_set(D6_PORT, D6_PIN);
     break;
-
   case 0x11:
-    gpio_clear(D9_PORT, D9_PIN);
+    gpio_clear(D6_PORT, D6_PIN);
     break;
 
+  /* D5. */
   case 0x20:
-    gpio_set(D10_PORT, D10_PIN);
+    gpio_set(D5_PORT, D5_PIN);
     break;
-
   case 0x21:
-    gpio_clear(D10_PORT, D10_PIN);
+    gpio_clear(D5_PORT, D5_PIN);
     break;
 
+  /* D4. */
+  case 0x30:
+    gpio_set(D4_PORT, D4_PIN);
+    break;
+  case 0x31:
+    gpio_clear(D4_PORT, D4_PIN);
+    break;
+
+  /* Clear All. */
   case ASCII_DEL:
-    gpio_set(D8_PORT, D8_PIN);
-    gpio_set(D9_PORT, D9_PIN);
-    gpio_set(D10_PORT, D10_PIN);
+    gpio_set(D7_PORT, D7_PIN);
+    gpio_set(D6_PORT, D6_PIN);
+    gpio_set(D5_PORT, D5_PIN);
+    gpio_set(D4_PORT, D4_PIN);
     break;
 
   case ASCII_CR:
@@ -230,7 +250,6 @@ void usart2_isr(void)
   default:
     /* Do nothing. */
     break;
-
   }
 
   /*

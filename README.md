@@ -10,7 +10,7 @@ The peripherals firmware of RASDK.
 - Stop bits: 1
 - Flow Control: None
 
-## Env
+## References
 - IDE: [PlatformIO IDE for VSCode](https://docs.platformio.org/en/latest/integration/ide/vscode.html)
 - Board: [Nucleo-F401RE](https://www.st.com/en/evaluation-tools/nucleo-f401re.html) (STM32F401RE)
   - [Board Datasheet](https://www.st.com/resource/en/user_manual/um1724-stm32-nucleo64-boards-mb1136-stmicroelectronics.pdf)
